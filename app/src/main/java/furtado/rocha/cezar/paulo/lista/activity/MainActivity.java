@@ -8,43 +8,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import furtado.rocha.cezar.paulo.lista.R;
 import furtado.rocha.cezar.paulo.lista.adapter.MyAdapter;
 import furtado.rocha.cezar.paulo.lista.model.MyItem;
+import furtado.rocha.cezar.paulo.lista.util.Util;
 
 public class MainActivity extends AppCompatActivity {
 
     static int NEW_ITEM_REQUEST =1;
+    MyAdapter myAdapter;
     List<MyItem> itens = new ArrayList<>();
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == NEW_ITEM_REQUEST) { // Verificacao se as condicoes de retorno foram cumpridas
-            if (resultCode == Activity.RESULT_OK) {
-                // Instancia para guardar dados do item
-                MyItem myItem = new MyItem();
-                //Obtencao dos dados retornados
-                myItem.title = data.getStringExtra("title");
-                myItem.description = data.getStringExtra("description");
-                myItem.photo = data.getData();
-
-                //Adicao do item a lista de itens
-                itens.add(myItem);
-                myAdapter.notifyItemInserted(itens.size()-1);
-            }
-        }
-    }
-
-    MyAdapter myAdapter;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         //Ouvidor de cliques
         fabAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { // metodo com Intent explicito para navegar para NewItemActivity
+            public void onClick(View view) {
+                // metodo com Intent explicito para navegar para NewItemActivity
                 Intent i = new Intent(MainActivity.this, NewItemActivity.class);
                 //metodo que assume que a Activity NewItemActivity vai retornar com dados para essa Activity
                 startActivityForResult(i, NEW_ITEM_REQUEST);
@@ -83,5 +69,36 @@ public class MainActivity extends AppCompatActivity {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvItens.getContext(), DividerItemDecoration.VERTICAL);
         // O divisor e colocado no RecyclerView
         rvItens.addItemDecoration(dividerItemDecoration);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_ITEM_REQUEST) { // Verificacao se as condicoes de retorno foram cumpridas
+            if (resultCode == Activity.RESULT_OK) {
+                // Instancia para guardar dados do item
+                MyItem myItem = new MyItem();
+                //Obtencao dos dados retornados
+                myItem.title = data.getStringExtra("title");
+                myItem.description = data.getStringExtra("description");
+                Uri selectedPhotoURI = data.getData();
+
+
+                try {
+                    // Funcao que carrega a imagem e guarda dentro de um Bitmap, criando assim uma copia da imagem original
+                    Bitmap photo = Util.getBitmap(MainActivity.this, selectedPhotoURI, 100, 100);
+                    // O bitmap e guardado dentro de um objeto do tipo MyItem
+                    myItem.photo = photo;
+                }
+                // Caso o arquivo de imagem nao seja encontrado a excecao e disparada
+                catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                //Adicao do item a lista de itens
+                itens.add(myItem);
+                myAdapter.notifyItemInserted(itens.size()-1);
+            }
+        }
     }
 }
