@@ -26,26 +26,32 @@ public class MyAdapter extends RecyclerView.Adapter {
     }
 
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //Inflador que sera usado para ler o arquivo xml e entao criar os elementos de interface
         LayoutInflater inflater = LayoutInflater.from(mainActivity);
         View v = inflater.inflate(R.layout.item_list,parent,false);
         return new MyViewHolder(v);
     }
 
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) { // Preencher a UI com os dados de um item
+        // Recepcao da posicao para indicar o item correto
         MyItem myItem = itens.get(position);
 
         View v = holder.itemView;
 
+        // Preenchimento da UI com a imagem
         ImageView imvphoto = v.findViewById(R.id.imvPhoto);
         imvphoto.setImageURI(myItem.photo);
 
+        // Preenchimento da UI com o titulo
         TextView tvTitle = v.findViewById(R.id.tvTitle);
         tvTitle.setText(myItem.title);
 
+        // Preenchimento da UI com a descricao
         TextView tvdesc = v.findViewById((R.id.tvDesc));
         tvdesc.setText(myItem.description);
     }
 
+    // Retorno do tamanho da lista dos itens
     public int getItemCount() {
         return itens.size();
     }

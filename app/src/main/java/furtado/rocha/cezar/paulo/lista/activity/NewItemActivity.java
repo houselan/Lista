@@ -26,23 +26,26 @@ public class NewItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
 
-
+        // Obtencao do ImageButton e definicao do ouvidor de cliques nele
         ImageButton imgCl = findViewById(R.id.imbCl);
         imgCl.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent,PHOTO_PICKER_REQUEST);
+            public void onClick(View view) { // Execucao da abertura da galeria para escolher a foto
+                Intent photoPickerIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT); // Intent implicito para abrir documento
+                photoPickerIntent.setType("image/*"); // Busca por apenas documentos com qualquer tipo de imagem
+                startActivityForResult(photoPickerIntent,PHOTO_PICKER_REQUEST); // Execucao do Intent com a imagem selecionada como resultado
             }
         });
 
+        // Obtemos o botao e colocamos o ouvidor de cliques nele
         Button btnAddItem = findViewById(R.id.btnAddItem);
 
         btnAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Verificacao se os campos estao vazios
                 if (photoSelected == null) {
+                    // Se os campos estiverem vazios uma mensagem de erro e exibida
                     Toast.makeText(NewItemActivity.this, "É necessário selecionar uma imagem!", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -60,11 +63,13 @@ public class NewItemActivity extends AppCompatActivity {
                     return;
                 }
 
+                //Retorno de dados para a Activity que a chamou
                 Intent i = new Intent();
                 i.setData(photoSelected);
                 i.putExtra("title", title);
                 i.putExtra("description", description);
                 setResult(Activity.RESULT_OK, i);
+                //Finalizacao da Activity
                 finish();
             }
         });
@@ -73,9 +78,11 @@ public class NewItemActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PHOTO_PICKER_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == PHOTO_PICKER_REQUEST) { // Verificacao se o requestCode e o mesmo do que o fornecido
+            if (resultCode == Activity.RESULT_OK) { // Verificacao se o resultCode e um codigo de sucesso
+                //Obtencao do endereco para acessar a imagem
                 photoSelected = data.getData();
+                //Obtencao do ImageVIew e colocacao da foto para ser exibida
                 ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
                 imvfotoPreview.setImageURI(photoSelected);
             }
