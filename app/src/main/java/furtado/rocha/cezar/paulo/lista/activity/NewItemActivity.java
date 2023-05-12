@@ -2,6 +2,8 @@ package furtado.rocha.cezar.paulo.lista.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,16 +17,29 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import furtado.rocha.cezar.paulo.lista.R;
+import furtado.rocha.cezar.paulo.lista.model.NewItemActivityViewModel;
 
 public class NewItemActivity extends AppCompatActivity {
 
     static int PHOTO_PICKER_REQUEST = 1;
-    Uri photoSelected = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
+
+        // Obtencao do ViewlModel que se refere a NewItemActivity (NewItemActivityViewModel)
+        NewItemActivityViewModel vm = new ViewModelProvider(this).get(NewItemActivityViewModel.class);
+
+        // Obtencao do URI guardado no ViewModel
+        Uri selectPhotoLocation = vm.getSelectPhotoLocation();
+
+        // Condicao que e executada se o usuario ja tiver escolhido uma imagem antes de rotacionar a a tela
+        if (selectPhotoLocation != null) {
+            // ImageView setado na tela
+            ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
+            imvfotoPreview.setImageURI(selectPhotoLocation);
+        }
 
         // Obtencao do ImageButton e definicao do ouvidor de cliques nele
         ImageButton imgCl = findViewById(R.id.imbCl);
@@ -43,22 +58,29 @@ public class NewItemActivity extends AppCompatActivity {
         btnAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Verificacao se os campos estao vazios
+                // Obtencao da imagem guardada no ViewModel
+                Uri photoSelected = vm.getSelectPhotoLocation();
+                //Verificacao se o campo de foto esta vazio
                 if (photoSelected == null) {
-                    // Se os campos estiverem vazios uma mensagem de erro e exibida
+                    // Se o campo estiver vazio uma mensagem de erro e exibida
                     Toast.makeText(NewItemActivity.this, "É necessário selecionar uma imagem!", Toast.LENGTH_LONG).show();
                     return;
                 }
+
                 EditText etTitle = findViewById(R.id.etTitle);
                 String title = etTitle.getText().toString();
+                //Verificacao se o campo de titulo esta vazio
                 if (title.isEmpty()) {
+                    // Se o campo estiver vazio uma mensagem de erro e exibida
                     Toast.makeText(NewItemActivity.this, "É necessário inserir um título", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                EditText etDesc = findViewById(R.id.etDesc);
+                 EditText etDesc = findViewById(R.id.etDesc);
                 String description = etDesc.getText().toString();
+                //Verificacao se o campo de descricao esta vazio
                 if (description.isEmpty()) {
+                    // Se o campo estiver vazio uma mensagem de erro e exibida
                     Toast.makeText(NewItemActivity.this, "É necessário inserir uma descrição", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -81,10 +103,17 @@ public class NewItemActivity extends AppCompatActivity {
         if (requestCode == PHOTO_PICKER_REQUEST) { // Verificacao se o requestCode e o mesmo do que o fornecido
             if (resultCode == Activity.RESULT_OK) { // Verificacao se o resultCode e um codigo de sucesso
                 //Obtencao do endereco para acessar a imagem
-                photoSelected = data.getData();
-                //Obtencao do ImageVIew e colocacao da foto para ser exibida
+                Uri photoSelected = data.getData();
+                //Obtencao do ImageVIew
                 ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
+
+                //Exibicao da foto
                 imvfotoPreview.setImageURI(photoSelected);
+
+                // Obtencao do ViewlModel
+                NewItemActivityViewModel vm = new ViewModelProvider(this).get(NewItemActivityViewModel.class);
+                // Colocando o endereço URI da imagem escolhida no ViewModel
+                vm.setSelectPhotoLocation(photoSelected);
             }
         }
     }

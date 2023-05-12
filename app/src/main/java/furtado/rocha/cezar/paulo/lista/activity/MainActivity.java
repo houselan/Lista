@@ -2,6 +2,7 @@ package furtado.rocha.cezar.paulo.lista.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import furtado.rocha.cezar.paulo.lista.R;
 import furtado.rocha.cezar.paulo.lista.adapter.MyAdapter;
+import furtado.rocha.cezar.paulo.lista.model.MainActivityViewModel;
 import furtado.rocha.cezar.paulo.lista.model.MyItem;
 import furtado.rocha.cezar.paulo.lista.util.Util;
 
@@ -28,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
 
     static int NEW_ITEM_REQUEST =1;
     MyAdapter myAdapter;
-    List<MyItem> itens = new ArrayList<>();
-
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Obtencao do RecyclerView
         RecyclerView rvItens = findViewById(R.id.rvItens);
+
+        // Obtencao do ViewModel que se refere a MainActivity (MainActivityViewlModel)
+        MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        // A lista de itens e obtida a partir do ViewModel e repassada para o Adapter
+        List<MyItem> itens = vm.getItens();
 
         // Criacao do MyAdapter
         myAdapter = new MyAdapter(this,itens);
@@ -95,7 +100,12 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                //Adicao do item a lista de itens
+                // Obtencao do ViewModel
+                MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+                // Obtencao da lista de itens que o ViewModel possui
+                List<MyItem> itens = vm.getItens();
+
+                // Adicao do item a lista de itens
                 itens.add(myItem);
                 myAdapter.notifyItemInserted(itens.size()-1);
             }
